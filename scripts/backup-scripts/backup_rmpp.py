@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import urllib.request, json, shutil
+import urllib.request, json, shutil, os
 from pathlib import Path
 from datetime import datetime
 
@@ -7,6 +7,9 @@ from backup_utils import create_zip_archive, cleanup_old_backups
 
 HOST = "http://10.11.99.1"
 HDR = {"Accept": "*/*"}
+
+# Directory to use as the working directory for backups
+BASE_DIR = Path("/Users/matthew/Documents/Backups/RMPP")
 
 """
 Make sure the reMarkable Paper Pro is connected to the computer via USB. Go to Settings > Storage > Enable USB web interface.
@@ -28,7 +31,7 @@ def walk_docs(base_id=""):
 
 def backup(target_names=("Personal", "Work")):
     stamp = datetime.now().strftime("%Y-%m-%d")
-    zip_path = Path(__file__).resolve().parent / f"rmpp backup {stamp}.zip"
+    zip_path = Path.cwd() / f"rmpp backup {stamp}.zip"
     out_dir = Path("backup_tmp")
 
     if out_dir.exists():
@@ -60,5 +63,9 @@ def backup(target_names=("Personal", "Work")):
 
 
 if __name__ == "__main__":
+    # Ensure backup directory exists and make it the working directory
+    BASE_DIR.mkdir(parents=True, exist_ok=True)
+    os.chdir(BASE_DIR)
+
     backup()
     cleanup_old_backups()
