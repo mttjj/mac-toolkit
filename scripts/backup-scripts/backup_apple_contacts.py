@@ -5,7 +5,7 @@ from datetime import datetime
 
 from backup_utils import create_zip_archive, cleanup_old_backups
 
-FINAL_DIR = Path("/Users/matthew/Documents/Backups/contacts")
+FINAL_DIR = Path("/Volumes/external/Backups/Contacts")
 
 
 def export_contacts(out_dir):

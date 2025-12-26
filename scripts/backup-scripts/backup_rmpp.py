@@ -9,7 +9,7 @@ HOST = "http://10.11.99.1"
 HDR = {"Accept": "*/*"}
 
 # Directory to use as the working directory for backups
-FINAL_DIR = Path("/Users/matthew/Documents/Backups/RMPP")
+FINAL_DIR = Path("/Volumes/external/Backups/reMarkable")
 
 """
 Make sure the reMarkable Paper Pro is connected to the computer via USB. Go to Settings > Storage > Enable USB web interface.
