@@ -1,6 +1,2 @@
-- Script to backup Apple Contacts (https://github.com/alexkuc/osx-export-contacts/blob/master/Export-contacts.applescript)
-    - Run from Python. Having issues executing the AppleScript from python.
-- Script to backup Apple Calendars (https://github.com/ZbigniewTomanek/ekexport)
-    - Have an open GitHub Issue for problems running it.
 - Script to backup (export) homebrew installed programs
 - Script to backup Apple Passwords
