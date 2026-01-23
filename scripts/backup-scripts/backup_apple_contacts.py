@@ -49,4 +49,4 @@ def backup():
 
 if __name__ == "__main__":
     backup()
-    cleanup_old_backups()
+    cleanup_old_backups(FINAL_DIR)
