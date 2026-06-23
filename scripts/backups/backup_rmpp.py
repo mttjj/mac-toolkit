@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import urllib.request, json, shutil, os
+import urllib.request, json, shutil
 from pathlib import Path
 from datetime import datetime
 
@@ -65,4 +65,4 @@ def backup(target_names=("Personal", "Work")):
 
 if __name__ == "__main__":
     backup()
-    cleanup_old_backups(FINAL_DIR)
+    cleanup_old_backups(backup_dir=FINAL_DIR)

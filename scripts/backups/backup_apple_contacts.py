@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import subprocess, shutil, os
+import subprocess, shutil
 from pathlib import Path
 from datetime import datetime
 
@@ -49,4 +49,4 @@ def backup():
 
 if __name__ == "__main__":
     backup()
-    cleanup_old_backups(FINAL_DIR)
+    cleanup_old_backups(backup_dir=FINAL_DIR)
