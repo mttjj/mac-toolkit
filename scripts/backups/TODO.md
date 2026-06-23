@@ -1,2 +1,0 @@
-- Script to backup (export) homebrew installed programs
-- Script to backup Apple Passwords
