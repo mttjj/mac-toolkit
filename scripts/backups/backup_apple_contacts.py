@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-import subprocess, shutil
-from pathlib import Path
+import shutil
+import subprocess
 from datetime import datetime
+from pathlib import Path
 
-from backup_utils import create_zip_archive, cleanup_old_backups
+from backup_utils import cleanup_old_backups
+from backup_utils import cleanup_tmp_dir
+from backup_utils import create_zip_archive
 
 FINAL_DIR = Path("/Volumes/external/Backups/Contacts")
+TMP_DIR = Path("backup_tmp")
 
 
 def export_contacts(out_dir):
@@ -30,21 +34,20 @@ def export_contacts(out_dir):
 
 
 def backup():
+    """Backup contacts from macOS Address Book to zip archive."""
     stamp = datetime.now().strftime("%Y-%m-%d")
     zip_path = Path.cwd() / f"contacts-{stamp}.zip"
 
-    out_dir = Path("backup_tmp")
-    if out_dir.exists():
-        shutil.rmtree(out_dir)
-    out_dir.mkdir()
+    cleanup_tmp_dir(TMP_DIR)
+    TMP_DIR.mkdir()
 
-    if export_contacts(out_dir):
-        create_zip_archive(out_dir, zip_path)
-
-        shutil.move(zip_path, FINAL_DIR / zip_path.name)
-
-        shutil.rmtree(out_dir)
-        print(f"Created {zip_path.name}")
+    try:
+        if export_contacts(TMP_DIR):
+            create_zip_archive(TMP_DIR, zip_path)
+            shutil.move(str(zip_path), str(FINAL_DIR / zip_path.name))
+            print(f"Created {zip_path.name}")
+    finally:
+        cleanup_tmp_dir(TMP_DIR)
 
 
 if __name__ == "__main__":

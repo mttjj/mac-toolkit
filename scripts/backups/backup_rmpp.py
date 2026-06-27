@@ -1,28 +1,32 @@
 #!/usr/bin/env python3
-import urllib.request, json, shutil
-from pathlib import Path
+import json
+import shutil
+import urllib.request
 from datetime import datetime
+from pathlib import Path
 
-from backup_utils import create_zip_archive, cleanup_old_backups
+from backup_utils import cleanup_old_backups
+from backup_utils import cleanup_tmp_dir
+from backup_utils import create_zip_archive
 
 HOST = "http://10.11.99.1"
 HDR = {"Accept": "*/*"}
-
-# Directory to use as the working directory for backups
 FINAL_DIR = Path("/Volumes/external/Backups/reMarkable")
+TMP_DIR = Path("backup_tmp")
 
-"""
-Make sure the reMarkable Paper Pro is connected to the computer via USB. Go to Settings > Storage > Enable USB web interface.
-"""
+# Make sure the reMarkable Paper Pro is connected to the computer via USB.
+# Go to Settings > Storage > Enable USB web interface.
 
 
 def get(url):
+    """Fetch JSON from the reMarkable device."""
     req = urllib.request.Request(url, headers=HDR)
     with urllib.request.urlopen(req, timeout=10) as resp:
         return json.load(resp)
 
 
 def walk_docs(base_id=""):
+    """Recursively yield document IDs, names, and folder status."""
     for item in get(f"{HOST}/documents/{base_id}"):
         yield item["ID"], item["VissibleName"], item["Type"] == "CollectionType"
         if item["Type"] == "CollectionType":
@@ -30,37 +34,36 @@ def walk_docs(base_id=""):
 
 
 def backup(target_names=("Personal", "Work")):
+    """Backup documents from reMarkable device."""
     stamp = datetime.now().strftime("%Y-%m-%d")
     zip_path = Path.cwd() / f"rmpp-{stamp}.zip"
-    out_dir = Path("backup_tmp")
 
-    if out_dir.exists():
-        shutil.rmtree(out_dir)
-    out_dir.mkdir()
+    cleanup_tmp_dir(TMP_DIR)
+    TMP_DIR.mkdir()
 
-    folders = {name: None for name in target_names}
-    for uid, name, is_folder in walk_docs():
-        if is_folder and name in folders:
-            folders[name] = uid
+    try:
+        folders = {name: None for name in target_names}
+        for uid, name, is_folder in walk_docs():
+            if is_folder and name in folders:
+                folders[name] = uid
 
-    for folder_name, folder_id in folders.items():
-        if folder_id is None:
-            print(f"Folder '{folder_name}' not found")
-            continue
-        for uid, name, is_folder in walk_docs(folder_id):
-            if is_folder:
+        for folder_name, folder_id in folders.items():
+            if folder_id is None:
+                print(f"Folder '{folder_name}' not found")
                 continue
-            dest = out_dir / folder_name / f"{name}.rmdoc"
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            print(f"Downloading {dest}")
-            urllib.request.urlretrieve(f"{HOST}/download/{uid}/rmdoc", str(dest))
+            for uid, name, is_folder in walk_docs(folder_id):
+                if is_folder:
+                    continue
+                dest = TMP_DIR / folder_name / f"{name}.rmdoc"
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                print(f"Downloading {dest}")
+                urllib.request.urlretrieve(f"{HOST}/download/{uid}/rmdoc", str(dest))
 
-    create_zip_archive(out_dir, zip_path)
-
-    shutil.move(zip_path, FINAL_DIR / zip_path.name)
-
-    shutil.rmtree(out_dir)
-    print(f"Created {zip_path.name}")
+        create_zip_archive(TMP_DIR, zip_path)
+        shutil.move(str(zip_path), str(FINAL_DIR / zip_path.name))
+        print(f"Created {zip_path.name}")
+    finally:
+        cleanup_tmp_dir(TMP_DIR)
 
 
 if __name__ == "__main__":

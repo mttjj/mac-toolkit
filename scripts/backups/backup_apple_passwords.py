@@ -7,20 +7,23 @@ from datetime import datetime
 from pathlib import Path
 
 from pykeepass import create_database
-from backup_utils import cleanup_old_backups
 
+from backup_utils import cleanup_old_backups
+from backup_utils import cleanup_tmp_dir
 
 CSV_PATH = Path("~/Downloads/Passwords.csv").expanduser()
 FINAL_DIR = Path("/Volumes/external/Backups/Passwords")
-
+TMP_DIR = Path("backup_tmp")
 KDBX_PASSWORD_ENV = "KDBX_PASSWORD"
 
 
 def norm(x):
+    """Normalize CSV field: convert None to empty string, strip whitespace."""
     return "" if x is None else str(x).strip()
 
 
 def load_rows(csv_file: Path):
+    """Load and deduplicate rows from Apple Passwords CSV export."""
     with csv_file.open("r", encoding="utf-8-sig", newline="") as f:
         reader = csv.DictReader(f)
         expected = ["Title", "URL", "Username", "Password", "Notes"]
@@ -33,8 +36,6 @@ def load_rows(csv_file: Path):
             title = norm(row.get("Title"))
             url = norm(row.get("URL"))
             username = norm(row.get("Username"))
-            if not username:
-                username = '<no username>'
             password = norm(row.get("Password"))
             notes = norm(row.get("Notes"))
 
@@ -59,6 +60,7 @@ def load_rows(csv_file: Path):
 
 
 def backup():
+    """Backup passwords from Apple Passwords CSV to KeePass database."""
     FINAL_DIR.mkdir(parents=True, exist_ok=True)
 
     if not CSV_PATH.exists():
@@ -70,13 +72,11 @@ def backup():
 
     stamp = datetime.now().strftime("%Y-%m-%d")
 
-    out_dir = Path("backup_tmp")
-    if out_dir.exists():
-        shutil.rmtree(out_dir)
-    out_dir.mkdir()
+    cleanup_tmp_dir(TMP_DIR)
+    TMP_DIR.mkdir()
 
     try:
-        out_kdbx = out_dir / "apple-passwords.kdbx"
+        out_kdbx = TMP_DIR / "apple-passwords.kdbx"
 
         kp = create_database(filename=str(out_kdbx), password=kdbx_password)
         root = kp.root_group
@@ -85,7 +85,7 @@ def backup():
             kp.add_entry(
                 destination_group=root,
                 title=(title or url or username or "Imported entry"),
-                username=username or None,
+                username=username or '<no username>',
                 password=password or None,
                 url=url or None,
                 notes=notes or None,
@@ -97,12 +97,12 @@ def backup():
         shutil.move(str(out_kdbx), str(final_kdbx))
         print(f"Created {final_kdbx.name}")
 
-        # Always delete plaintext CSV
+        # Always delete plaintext CSV only after success (no Trash)
         CSV_PATH.unlink()
         print("Deleted exported CSV.")
 
     finally:
-        shutil.rmtree(out_dir, ignore_errors=True)
+        cleanup_tmp_dir(TMP_DIR)
 
 
 if __name__ == "__main__":
