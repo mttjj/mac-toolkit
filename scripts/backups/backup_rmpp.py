@@ -34,7 +34,7 @@ def walk_docs(base_id=""):
 
 
 def backup(target_names=("Personal", "Work")):
-    """Backup documents from reMarkable device."""
+    """Backup documents from the reMarkable device."""
     stamp = datetime.now().strftime("%Y-%m-%d")
     zip_path = Path.cwd() / f"rmpp-{stamp}.zip"
 
