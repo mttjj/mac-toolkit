@@ -1,0 +1,1 @@
+Scripts that an LLM generated to help groom all my media and update/fix metadata for it. Used throughout July 2026. The scripts are not meant to be good or even make sense. They are just included here for posterity.
