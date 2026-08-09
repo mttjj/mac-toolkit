@@ -8,7 +8,7 @@ from backup_utils import cleanup_old_backups
 from backup_utils import cleanup_tmp_dir
 from backup_utils import create_zip_archive
 
-FINAL_DIR = Path("/Volumes/external/Backups/Contacts")
+FINAL_DIR = Path("/Volumes/Transient Backups - 2026/Contacts")
 TMP_DIR = Path("backup_tmp")
 
 

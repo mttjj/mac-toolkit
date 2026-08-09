@@ -11,7 +11,7 @@ from backup_utils import create_zip_archive
 
 HOST = "http://10.11.99.1"
 HDR = {"Accept": "*/*"}
-FINAL_DIR = Path("/Volumes/external/Backups/reMarkable")
+FINAL_DIR = Path("/Volumes/Transient Backups - 2026/reMarkable")
 TMP_DIR = Path("backup_tmp")
 
 # Make sure the reMarkable Paper Pro is connected to the computer via USB.

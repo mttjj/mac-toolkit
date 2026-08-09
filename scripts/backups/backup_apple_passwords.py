@@ -12,7 +12,7 @@ from backup_utils import cleanup_old_backups
 from backup_utils import cleanup_tmp_dir
 
 CSV_PATH = Path("~/Downloads/Passwords.csv").expanduser()
-FINAL_DIR = Path("/Volumes/external/Backups/Passwords")
+FINAL_DIR = Path("/Volumes/Transient Backups - 2026/Passwords")
 TMP_DIR = Path("backup_tmp")
 KDBX_PASSWORD_ENV = "KDBX_PASSWORD"
 
