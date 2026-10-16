@@ -41,7 +41,7 @@ run_rmpp() {
   echo "--- reMarkable Paper Pro Backup ---"
   echo "Prerequisites:"
   echo "  1. Connect the reMarkable Paper Pro to this computer via USB."
-  echo "  2. On the device: Settings > Storage > Enable USB web interface."
+  echo "  2. Passwordless 'ssh rmpp' must work."
   echo ""
   read -r -p "Ready to continue? [y/N] " confirm
   if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
@@ -56,7 +56,7 @@ print_menu() {
   echo "Backups"
   echo "  1) Apple Contacts"
   echo "  2) Apple Passwords  (requires manual CSV export first)"
-  echo "  3) reMarkable Paper Pro  (requires USB + USB web interface enabled)"
+  echo "  3) reMarkable Paper Pro  (requires USB + SSH access)"
   echo "  4) All of the above"
   echo "  q) Quit"
   echo ""
